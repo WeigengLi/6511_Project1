@@ -106,7 +106,7 @@ def print_results(list_pitcher):
                 count += 2
     print("Total: "+str(count)+" move")
 
-def AStar_search(pitchers, target,print_result):
+def AStar_search(pitchers, target):
     open_set = []
     close_set = []
     pitcher_state = {}
@@ -126,23 +126,31 @@ def AStar_search(pitchers, target,print_result):
             add_state = current_node.state+pitcher
             if not add_state in close_set:
                 add_pitcher_node = AStar_node(pitcher,current_node)
-                heapq.heappush(open_set,add_pitcher_node)
-                if add_state == target:
-                    result_list = add_pitcher_node.get_results()
-                    if print_result:print_results(result_list)
-                    return add_pitcher_node.gn    
+                if not add_pitcher_node.fn == inf:
+                    heapq.heappush(open_set,add_pitcher_node)
+                    if add_state == target:
+                        result_list = add_pitcher_node.get_results()
+                        print_results(result_list)
+                        print(len(open_set))
+                        return add_pitcher_node.gn
+                else:
+                    close_set.append(add_pitcher_node.state)    
             remove_state = current_node.state-pitcher
             if remove_state>=0 and not remove_state in close_set:
                 remove_pitcher_node = AStar_node(int(0-pitcher),current_node)
+                if remove_pitcher_node.fn == inf:
+                    close_set.append(remove_pitcher_node.state)
+                    continue
                 heapq.heappush(open_set,remove_pitcher_node)
                 if remove_state == target:
                     result_list = remove_pitcher_node.get_results()
-                    if print_result: print_results(result_list)
+                    print_results(result_list)
+                    print(len(open_set))
                     return remove_pitcher_node.gn  
+          
     return -1
 
-def load_text(filename):
-    
+def load_text(filename): 
     pitchers = []
     file= open(filename,'r').readlines()
     file[0] = file[0].replace("\n","")
@@ -152,29 +160,26 @@ def load_text(filename):
     target= int(file[1])
     return pitchers,target
 
-def test(print_result):
+def test():
     correct_result_list = [19,7,-1,-1]
     input_files = ['input','input1','input2','input3']
     count=0
     for input in input_files:
         pitchers,target=load_text('test_data/'+input+'.txt')
-        result=AStar_search(pitchers, target,print_result)
+        result=AStar_search(pitchers, target)
         if result != correct_result_list[count]:
             print('Wrong Answer!!!!')
             print("Correct result: "+str(correct_result_list[count]))
             print("Output move: "+str(result))
             return
-        count+=1 
-    print("All Tests Successfully")       
-        
+        count+=1
+
 def main():
-    test(False)
-    pitchers,target=load_text('test_data/input_test.txt')
-    result=AStar_search(pitchers,target,True)
+    pitchers,target=load_text('test_data/input4.txt')
+    result=AStar_search(pitchers, target)
+    print(result)
     if result == -1:
         print("No results found")
-    else:
-        print(result)
     
 if __name__ == '__main__':
     main()

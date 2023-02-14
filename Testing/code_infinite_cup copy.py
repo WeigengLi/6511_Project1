@@ -1,6 +1,7 @@
 from math import ceil,gcd,inf
 from Lib import heapq
-from numpy import unique
+from numpy import unique,sort
+import copy
 
 class AStar_node:
     '''
@@ -72,7 +73,7 @@ class AStar_node:
                 return inf
             ancestor = ancestor.parent
         pitchers=list(self.pitcher_state.keys())
-        result = ceil(abs(target-state)/max(pitchers))
+        result = (abs(target-state)/max(pitchers))
         #result = ceil(abs(target-state)/self.pitchers_gcd)
         return result
 
@@ -106,7 +107,7 @@ def print_results(list_pitcher):
                 count += 2
     print("Total: "+str(count)+" move")
 
-def AStar_search(pitchers, target,print_result):
+def AStar_search(pitchers, target):
     open_set = []
     close_set = []
     pitcher_state = {}
@@ -119,26 +120,36 @@ def AStar_search(pitchers, target,print_result):
     current_node = None
     while open_set:
         current_node = heapq.heappop(open_set)
-        close_set.append(current_node.state)
+        current_state = current_node.get_results()
+        current_state.sort()
+        close_set.append(current_state)
         if current_node.fn == inf:
             continue
         for pitcher in pitchers:
-            add_state = current_node.state+pitcher
-            if not add_state in close_set:
+            next_add_state = copy.deepcopy(current_state)
+            next_add_state.append(pitcher)
+            next_add_state.sort()
+            if not next_add_state in close_set:
                 add_pitcher_node = AStar_node(pitcher,current_node)
                 heapq.heappush(open_set,add_pitcher_node)
-                if add_state == target:
+                if add_pitcher_node.state == target:
                     result_list = add_pitcher_node.get_results()
-                    if print_result:print_results(result_list)
-                    return add_pitcher_node.gn    
-            remove_state = current_node.state-pitcher
-            if remove_state>=0 and not remove_state in close_set:
+                    print_results(result_list)
+                    print(len(open_set))
+                    return result_list,add_pitcher_node.gn    
+            
+            next_romove_state = copy.deepcopy(current_state)
+            next_romove_state.append(int(0-pitcher))
+            next_romove_state.sort()
+            if current_node.state-pitcher>=0 and not next_romove_state in close_set:
                 remove_pitcher_node = AStar_node(int(0-pitcher),current_node)
                 heapq.heappush(open_set,remove_pitcher_node)
-                if remove_state == target:
+                if remove_pitcher_node.state == target:
                     result_list = remove_pitcher_node.get_results()
-                    if print_result: print_results(result_list)
+                    print_results(result_list)
+                    print(len(open_set))
                     return remove_pitcher_node.gn  
+          
     return -1
 
 def load_text(filename):
@@ -151,30 +162,13 @@ def load_text(filename):
             pitchers.append(int(number))
     target= int(file[1])
     return pitchers,target
-
-def test(print_result):
-    correct_result_list = [19,7,-1,-1]
-    input_files = ['input','input1','input2','input3']
-    count=0
-    for input in input_files:
-        pitchers,target=load_text('test_data/'+input+'.txt')
-        result=AStar_search(pitchers, target,print_result)
-        if result != correct_result_list[count]:
-            print('Wrong Answer!!!!')
-            print("Correct result: "+str(correct_result_list[count]))
-            print("Output move: "+str(result))
-            return
-        count+=1 
-    print("All Tests Successfully")       
         
 def main():
-    test(False)
-    pitchers,target=load_text('test_data/input_test.txt')
-    result=AStar_search(pitchers,target,True)
+    pitchers,target=load_text('test_data/input.txt')
+    result=AStar_search(pitchers, target)
+    print(result)
     if result == -1:
         print("No results found")
-    else:
-        print(result)
     
 if __name__ == '__main__':
     main()
