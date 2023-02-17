@@ -84,7 +84,6 @@ def print_results(list_pitcher):
     pitcher_state = {}
     for unique_pitcher in pitcher_used:
         pitcher_state[unique_pitcher] =0
-    
     for pitcher in list_pitcher:
         state+=pitcher     
         if pitcher<0 and pitcher_state[pitcher]==0:
@@ -122,23 +121,19 @@ def AStar_search(pitchers, target,print_result):
         close_set.append(current_node.state)
         if current_node.fn == inf:
             continue
+        if current_node.state == target:
+            result_list = current_node.get_results()
+            if print_result:print_results(result_list)
+            return current_node.gn    
         for pitcher in pitchers:
             add_state = current_node.state+pitcher
             if not add_state in close_set:
                 add_pitcher_node = AStar_node(pitcher,current_node)
                 heapq.heappush(open_set,add_pitcher_node)
-                if add_state == target:
-                    result_list = add_pitcher_node.get_results()
-                    if print_result:print_results(result_list)
-                    return add_pitcher_node.gn    
             remove_state = current_node.state-pitcher
             if remove_state>=0 and not remove_state in close_set:
                 remove_pitcher_node = AStar_node(int(0-pitcher),current_node)
                 heapq.heappush(open_set,remove_pitcher_node)
-                if remove_state == target:
-                    result_list = remove_pitcher_node.get_results()
-                    if print_result: print_results(result_list)
-                    return remove_pitcher_node.gn  
     return -1
 
 def load_text(filename):
@@ -166,15 +161,20 @@ def test(print_result):
             return
         count+=1 
     print("All Tests Successfully")       
-        
-def main():
-    test(False)
-    pitchers,target=load_text('test_data/input_test.txt')
+
+def single_test(input):
+    pitchers,target=load_text(input)
     result=AStar_search(pitchers,target,True)
     if result == -1:
         print("No results found")
     else:
         print(result)
+
+      
+def main():
+    test(False)
+    single_test('test_data/input_test.txt')
+    
     
 if __name__ == '__main__':
     main()

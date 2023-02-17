@@ -122,17 +122,17 @@ def AStar_search(pitchers, target):
         close_set.append(current_node.state)
         if current_node.fn == inf:
             continue
+        if current_node.state == target:
+            result_list = current_node.get_results()
+            print_results(result_list)
+            print(len(open_set))
+            return add_pitcher_node.gn
         for pitcher in pitchers:
             add_state = current_node.state+pitcher
             if not add_state in close_set:
                 add_pitcher_node = AStar_node(pitcher,current_node)
                 if not add_pitcher_node.fn == inf:
-                    heapq.heappush(open_set,add_pitcher_node)
-                    if add_state == target:
-                        result_list = add_pitcher_node.get_results()
-                        print_results(result_list)
-                        print(len(open_set))
-                        return add_pitcher_node.gn
+                    heapq.heappush(open_set,add_pitcher_node) 
                 else:
                     close_set.append(add_pitcher_node.state)    
             remove_state = current_node.state-pitcher
@@ -142,11 +142,6 @@ def AStar_search(pitchers, target):
                     close_set.append(remove_pitcher_node.state)
                     continue
                 heapq.heappush(open_set,remove_pitcher_node)
-                if remove_state == target:
-                    result_list = remove_pitcher_node.get_results()
-                    print_results(result_list)
-                    print(len(open_set))
-                    return remove_pitcher_node.gn  
           
     return -1
 
@@ -175,6 +170,7 @@ def test():
         count+=1
 
 def main():
+    test()
     pitchers,target=load_text('test_data/input4.txt')
     result=AStar_search(pitchers, target)
     print(result)
