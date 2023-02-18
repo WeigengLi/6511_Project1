@@ -201,7 +201,6 @@ def single_test(input,answer):
         print("Output move: "+str(result))
         return False
     
-
 def calculate_time(time_start):
     time_end=time.time()
     cost_time = time_end-time_start
