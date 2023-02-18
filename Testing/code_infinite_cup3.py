@@ -1,8 +1,6 @@
 from math import ceil,gcd,inf
-import os
 from Lib import heapq
 from numpy import unique
-import time
 
 class AStar_node:
     '''
@@ -69,13 +67,11 @@ class AStar_node:
         if not abs(target - state)%self.pitchers_gcd == 0:
             return inf
         ancestor = self.parent
-        # There are redundant moves in this operation(add n water then remove n water)
         while not ancestor.gn == 0:
             if ancestor.pitcher == (0-self.pitcher):
                 return inf
             ancestor = ancestor.parent
         pitchers=list(self.pitcher_state.keys())
-        # calculate h(n)
         result = ceil(abs(target-state)/max(pitchers))
         #result = ceil(abs(target-state)/self.pitchers_gcd)
         return result
@@ -120,42 +116,28 @@ def AStar_search(pitchers, target,print_result):
     # use heapq push to change the open set into a heap
     heapq.heappush(open_set,root_node)
     current_node = None
-    max_state = 0
-    # BFS 
     while open_set:
-        # pop the node with lowest fn
         current_node = heapq.heappop(open_set)
-        if current_node.state in close_set:
-            continue
         close_set.append(current_node.state)
-        # this is for 
-        if current_node.state>max_state:
-            max_state = current_node.state
-        # this is the goal
+        if current_node.fn == inf:
+            continue
         if current_node.state == target:
             result_list = current_node.get_results()
             if print_result:print_results(result_list)
             return current_node.gn    
-        # Expend next nodes
         for pitcher in pitchers:
             add_state = current_node.state+pitcher
             if not add_state in close_set:
                 add_pitcher_node = AStar_node(pitcher,current_node)
-                # this node may leads to results
-                if not add_pitcher_node.fn == inf: 
-                    heapq.heappush(open_set,add_pitcher_node)
+                heapq.heappush(open_set,add_pitcher_node)
             remove_state = current_node.state-pitcher
             if remove_state>=0 and not remove_state in close_set:
                 remove_pitcher_node = AStar_node(int(0-pitcher),current_node)
-                # this node may leads to results
-                if not remove_pitcher_node.fn == inf: 
-                    heapq.heappush(open_set,remove_pitcher_node)
+                heapq.heappush(open_set,remove_pitcher_node)
     return -1
 
 def load_text(filename):
-    if not os.path.exists(filename):
-        print('File '+filename+' does not exist')
-        return
+    
     pitchers = []
     file= open(filename,'r').readlines()
     file[0] = file[0].replace("\n","")
@@ -170,10 +152,7 @@ def test(print_result):
     input_files = ['input','input1','input2','input3']
     count=0
     for input in input_files:
-        file = load_text('test_data/'+input+'.txt')
-        if(not file):
-            continue
-        pitchers,target=file
+        pitchers,target=load_text('test_data/'+input+'.txt')
         result=AStar_search(pitchers, target,print_result)
         if result != correct_result_list[count]:
             print('Wrong Answer!!!!')
@@ -184,35 +163,18 @@ def test(print_result):
     print("All Tests Successfully")       
 
 def single_test(input):
-    file = load_text(input)
-    if(not file):
-        return -1
-    pitchers,target=file
+    pitchers,target=load_text(input)
     result=AStar_search(pitchers,target,True)
     if result == -1:
         print("No results found")
+    else:
+        print(result)
 
-def calculate_time(time_start):
-    time_end=time.time()
-    cost_time = time_end-time_start
-    if cost_time < 60:
-        print('Time cost ',cost_time,'s')
-    elif cost_time > 60:
-        print('Time cost ',(cost_time)/60,'min')
-    elif cost_time > 3600:
-        print('Time cost ',(cost_time)/3600,'hour')
-    return time.time()
       
 def main():
-    time_start=time.time()
     test(False)
-    time_start=calculate_time(time_start)
     single_test('test_data/input4.txt')
-    time_start=calculate_time(time_start)
     
-
-
-
     
 if __name__ == '__main__':
     main()
