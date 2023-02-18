@@ -34,7 +34,7 @@ class AStar_node:
             self.state = parent.state+pitcher
             self.pitcher_state=parent.pitcher_state
             self.pitchers_gcd=parent.pitchers_gcd
-            # TODO: 增加注释 关于桶的情况
+            # Check
             if pitcher<0 and self.pitcher_state[abs(pitcher)]==0:
                 self.gn = parent.gn+1
                 self.pitcher_state[abs(pitcher)]=1
@@ -125,6 +125,7 @@ def AStar_search(pitchers, target,print_result):
     while open_set:
         # pop the node with lowest fn
         current_node = heapq.heappop(open_set)
+        # Not expending node in close set
         if current_node.state in close_set:
             continue
         close_set.append(current_node.state)
@@ -170,27 +171,36 @@ def test(print_result):
     input_files = ['input','input1','input2','input3']
     count=0
     for input in input_files:
-        file = load_text('test_data/'+input+'.txt')
-        if(not file):
-            continue
-        pitchers,target=file
-        result=AStar_search(pitchers, target,print_result)
-        if result != correct_result_list[count]:
-            print('Wrong Answer!!!!')
-            print("Correct result: "+str(correct_result_list[count]))
-            print("Output move: "+str(result))
-            return
-        count+=1 
-    print("All Tests Successfully")       
+        file = 'test_data/'  +input+'.txt'
+        if not single_test(file,correct_result_list[count]):
+            print("Wrong result end test") 
+            return False  
+        count+=1
+    print("All Tests Successfully") 
+    return True      
 
-def single_test(input):
+def single_test(input,answer):
     file = load_text(input)
     if(not file):
         return -1
     pitchers,target=file
+    print('-----------Testing '+str(input)+' File-----------')
+    print('Pitchers:',pitchers)
+    print('Target:',target)
     result=AStar_search(pitchers,target,True)
     if result == -1:
-        print("No results found")
+        print('Result: ',result," No results found")
+    else:
+        print('Result: ',result)
+    print('-----------End of '+str(input)+' File Test-----------')
+    if result == answer:
+        return True
+    else:
+        print('Wrong Answer for File: ',input)
+        print("Correct result: ",answer)
+        print("Output move: "+str(result))
+        return False
+    
 
 def calculate_time(time_start):
     time_end=time.time()
@@ -205,15 +215,11 @@ def calculate_time(time_start):
       
 def main():
     time_start=time.time()
-    test(False)
+    test(print_result=True)
     time_start=calculate_time(time_start)
-    single_test('test_data/input4.txt')
+    single_test('test_data/input4.txt',36)
     time_start=calculate_time(time_start)
-    
-
-
-
-    
+     
 if __name__ == '__main__':
     main()
     
