@@ -1,6 +1,7 @@
 from math import ceil,gcd,inf
 from Lib import heapq
 from numpy import unique
+import copy
 
 class AStar_node:
     '''
@@ -23,14 +24,14 @@ class AStar_node:
             self.state = 0
             self.gn = 0
             self.h = 0
-            self.pitcher_state = pitcher_state
+            self.pitcher_state = copy.deepcopy(pitcher_state)
             self.target = target
             self.get_gcd()
         # Set up for child node
         else:
             self.target = parent.target
             self.state = parent.state+pitcher
-            self.pitcher_state=parent.pitcher_state
+            self.pitcher_state=copy.deepcopy(parent.pitcher_state)
             self.pitchers_gcd=parent.pitchers_gcd
             # TODO: 增加注释 关于桶的情况
             if pitcher<0 and self.pitcher_state[abs(pitcher)]==0:
