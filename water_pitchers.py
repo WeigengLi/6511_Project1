@@ -167,13 +167,14 @@ def AStar_search(pitchers, target,print_result):
     return -1
 
 def load_text(filename):
+    # for read in files
     if not os.path.exists(filename):
         print('File '+filename+' does not exist')
         return
     pitchers = []
     file= open(filename,'r').readlines()
     file[0] = file[0].replace("\n","")
-    for number in file[0].split(','):
+    for number in file[0].strip().split(','):
         if number.isdigit():
             pitchers.append(int(number))
     target= int(file[1])
@@ -243,6 +244,8 @@ def main():
     #time_start=calculate_time(time_start)
     single_test('test_data/input_test.txt')
     #time_start=calculate_time(time_start)
+    #result=AStar_search([1,90,200],20,True)
+    #print(result)
      
 if __name__ == '__main__':
     main()
