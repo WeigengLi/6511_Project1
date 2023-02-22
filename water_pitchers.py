@@ -185,8 +185,8 @@ def test(print_result):
     Test multiple files
     print_result: boolean if this function print results
     '''
-    correct_result_list = [19,7,-1,-1]
-    input_files = ['input','input1','input2','input3']
+    correct_result_list = [19,7,-1,-1,36]
+    input_files = ['input','input1','input2','input3','input4']
     count=0
     for input in input_files:
         file = 'test_data/'  +input+'.txt'
@@ -239,13 +239,16 @@ def calculate_time(time_start):
     return time.time()
       
 def main():
-    #time_start=time.time()
-    #test(print_result=True)
-    #time_start=calculate_time(time_start)
+    time_start=time.time()
+    #Test Case on PDF
+    test(print_result=True)
+    time_start=calculate_time(time_start)
+    # Self Define test case(File read in)
     single_test('test_data/input_test.txt')
-    #time_start=calculate_time(time_start)
-    #result=AStar_search([1,90,200],20,True)
-    #print(result)
+    time_start=calculate_time(time_start)
+    # Self Define test case(Function input)
+    result=AStar_search(pitchers =[1,90,200],target=20,print_result=True)
+    print(result)
      
 if __name__ == '__main__':
     main()
