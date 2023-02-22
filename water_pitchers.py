@@ -10,13 +10,15 @@ class AStar_node:
     a node representing the operation of adding or removing water from
     the infinite cup
     attribute:
-        pitcher: positive: add water
-                 negative: remove water
+        pitcher: positive: add water to target
+                 negative: remove water from to target
         h: h(n) the heuristic
+        gn:  g(n) representing how many steps is taken after this operation
+            g(n)=g(n-1)+1 or g(n)=g(n-1)+2
+        fn: f(n) = g(n)+h(n)
         parent: parent node
         add_gn: how many steps this move need
-        gn:  g(n) representing how many steps is taken after this operation
-        state:
+        state: water in the target pitcher
     '''
     def __init__(self,pitcher,parent,target=None,pitcher_state=None):
         self.pitcher = pitcher
@@ -35,22 +37,27 @@ class AStar_node:
             self.state = parent.state+pitcher
             self.pitcher_state=copy.deepcopy(parent.pitcher_state)
             self.pitchers_gcd=copy.deepcopy(parent.pitchers_gcd)
-            # Check
+            # g(n)=g(n-1)+1 or g(n)=g(n-1)+2 explained in report
             if pitcher<0 and self.pitcher_state[abs(pitcher)]==0:
                 self.gn = parent.gn+1
                 self.pitcher_state[abs(pitcher)]=1
             else:
                 self.gn = parent.gn+2 
+            # calculate h(n)
             self.h = self.calculate_h()
         self.fn = self.gn+self.h
         
     def __lt__(self,other):
+        # fn is the value when comparing the node
+        # e.g. AStar_node1 < AStar_node2 means AStar_node1.fn < AStar_node2.fn
         return self.fn < other.fn
     
     def __str__(self):
+        # a function called by print() 
         return str(self.fn)
     
     def get_results(self):
+        # iterate from leaf to root to get a list of pitchers that the algorithm used
         if self.gn == 0:
             return []
         result = self.parent.get_results()
@@ -58,6 +65,7 @@ class AStar_node:
         return result
 
     def get_gcd(self):
+        # calculate gcd of all pitchers, explain in first section of report
         pitchers=list(self.pitcher_state.keys())
         greatest_common_divisor = gcd(pitchers[0],pitchers[-1])
         for pitcher in pitchers:
@@ -82,6 +90,10 @@ class AStar_node:
         return result
 
 def print_results(list_pitcher):
+    '''
+    This function takes a list of pitchers.
+    Then print the step and exam the results
+    '''
     print("Start with a 0 volume Pitcher")
     state = 0
     count = 0
@@ -168,6 +180,10 @@ def load_text(filename):
     return pitchers,target
 
 def test(print_result):
+    '''
+    Test multiple files
+    print_result: boolean if this function print results
+    '''
     correct_result_list = [19,7,-1,-1]
     input_files = ['input','input1','input2','input3']
     count=0
@@ -180,7 +196,11 @@ def test(print_result):
     print("All Tests Successfully") 
     return True      
 
-def single_test(input,answer):
+def single_test(input,answer=None):
+    '''
+    Test an single input file
+    and exam the result
+    '''
     file = load_text(input)
     if(not file):
         return -1
@@ -194,6 +214,10 @@ def single_test(input,answer):
     else:
         print('Result: ',result)
     print('-----------End of '+str(input)+' File Test-----------')
+    # unknown result
+    if answer == None:
+        return True
+    # exam result
     if result == answer:
         return True
     else:
@@ -214,11 +238,11 @@ def calculate_time(time_start):
     return time.time()
       
 def main():
-    time_start=time.time()
-    test(print_result=True)
-    time_start=calculate_time(time_start)
-    single_test('test_data/input4.txt',36)
-    time_start=calculate_time(time_start)
+    #time_start=time.time()
+    #test(print_result=True)
+    #time_start=calculate_time(time_start)
+    single_test('test_data/input_test.txt')
+    #time_start=calculate_time(time_start)
      
 if __name__ == '__main__':
     main()
