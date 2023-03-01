@@ -200,7 +200,7 @@ def test(print_result):
 def single_test(input,answer=None):
     '''
     Test an single input file
-    and exam the result
+    and exam the result 
     '''
     file = load_text(input)
     if(not file):
